@@ -20,11 +20,11 @@ public class AuthService {
     private final PlayerRepository playerRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager; //autenticar al usuario
+    private final AuthenticationManager authenticationManager;
 
     @CrossOrigin
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));//Recibe credenciales
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails player = playerRepository.findByUsername(request.getUsername()).orElseThrow(); 
         String token = jwtService.getToken((Player) player);
         return AuthResponse.builder() 
@@ -37,15 +37,15 @@ public class AuthService {
         Player player = Player.builder()
             .username(request.getUsername())
             .password(passwordEncoder.encode(request.getPassword()))
-            .firstname(request.getFirstname())
-            .lastname(request.getLastname())
+            .email(request.getEmail())
+            .age(request.getAge())
             .country(request.getCountry())
             .role(Role.USER)
             .build();
 
-        playerRepository.save(player); //Se guarda el objeto en la base de datos 
+        playerRepository.save(player); 
 
-        return AuthResponse.builder() //Se obtiene el token a traves del lservidode de jwt que se retorna al controlador y luego al cleinte
+        return AuthResponse.builder() 
             .token(jwtService.getToken(player))
             .build();
     }
